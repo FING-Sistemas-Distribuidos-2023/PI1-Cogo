@@ -1,0 +1,20 @@
+<html>
+
+<head></head>
+
+<body>
+    <h1>Calculadora de numeros cuadrados</h1>
+    <form action="/">
+        <label for="number">Ingresa un numero:</label>
+        <input type="text" id="number" name="number"><br><br>
+        <input type="submit" value="Submit">
+      </form>
+    <h2>El cuadrado del numero ingresado es:</h2>
+    {% if result %}
+    <data>{{result}}</data>
+    {% else %}
+    <data>0</data>
+    {% endif %}
+</body>
+
+</html>
