@@ -10,13 +10,16 @@ if(host == None or port == None):
 else:
     r = redis.Redis(host=host,port=int(port), decode_responses=True)
 
-sub = r.pubsub()
-sub.subscribe("toBack")
+goQ = r.pubsub()
+goQ.subscribe("toFront")
+comeQ = r.pubsub()
+comeQ.subscribe("toBack")
 
-while True:
-    for msg in sub.listen():
-        if msg != None:
-            x = msg.get('num');
-            if(x!= None):
-                i = x*x;
-                r.publish("toFront",{'result' : x})
+while True:    
+    msg =  comeQ.get_message()
+    if msg != None:
+        print(msg)
+        x = int(msg.get('data'))
+        if(x != None):
+            r.publish("toFront",x*x)    
+        

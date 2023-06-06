@@ -1,6 +1,10 @@
 from django.shortcuts import render
+from django.http import request, response
+from django import forms
+
 import os
 import redis;
+
 
 host = os.getenv('REDIS_HOST')
 port = os.getenv('REDIS_PORT')
@@ -10,18 +14,19 @@ if(host == None or port == None):
 else:
     r = redis.Redis(host=host,port=int(port), decode_responses=True)
 
-sub = r.pubsub()
-sub.subscribe('toFront')
+goQ = r.pubsub()
+goQ.subscribe("toBack")
+comeQ = r.pubsub()
+comeQ.subscribe("toFront")
 
-def calchandler(request):
-    if(request.method == "GET"):
-        return render(request,'index.html',{'result':0});
-    else:
-        if(request.method == "POST"):
-            num = request.number;
-            r.publish("toFront",{'result' : num})
-            msg = sub.get_message();
-            while(msg!=None):
-                for msg in sub.listen():
-                    x = sub.get_message().get('num');
-            return render(request,'index.html',{'result':int(x)});    
+def getHandler(request : request)->response:
+    opResult : int = 0;
+    if(request.method == "POST"):
+        a = request.POST.get("number")
+        r.publish("toBack",int(a));
+        msg = None
+        while msg == None:
+            msg = comeQ.get_message();
+            if(msg!=None):
+                opResult = int(msg.get('data'));
+    return render(request,'index.html',{'result':opResult});

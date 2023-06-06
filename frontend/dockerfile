@@ -1,6 +1,6 @@
 FROM python:3.11.3-alpine3.17
 
-WORKDIR /app
+WORKDIR /frontend
 
 RUN apk update && pip install --upgrade pip
 
@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt
 
 COPY ./ ./
 
-CMD ["python3.11","manager.py","runserver","0.0.0.0:8000"]
+CMD ["python3.11","manage.py","runserver","0.0.0.0:8000"]

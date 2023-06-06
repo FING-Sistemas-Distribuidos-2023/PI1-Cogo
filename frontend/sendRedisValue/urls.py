@@ -3,5 +3,5 @@ from . import views
 
 #urlConf
 urlpatterns = [
-    path('',views.calchandler)
+    path('',views.getHandler)   
 ]
