@@ -1,22 +1,27 @@
 from django.shortcuts import render
+import os
+import redis;
 
-#REDIS
-from redis import RedisCluster
+host = os.getenv('REDIS_HOST')
+port = os.getenv('REDIS_PORT')
 
-rc = RedisCluster(host='localhost', port=16379)
-sub = rc.pubsub()
-sub.subscribe("toFront")
+if(host == None or port == None):
+    raise Exception("Invalid host or port (make sure you load REDIS_HOST and REDIS_PORT evironment variables")
+else:
+    r = redis.Redis(host=host,port=int(port), decode_responses=True)
 
-def sendToRedisQueue(i:int)->None:
-    rc.publish("toBack",str(i))
-    return ;
-    
-def readRedisQueue()->int:
-    msg = sub.get_message()
-    return int(msg['data'])
+sub = r.pubsub()
+sub.subscribe('toFront')
 
-# Handlers
-def sendValueHandler(request):
-    sendToRedisQueue(request)
-    x = readRedisQueue()
-    return render(request,"index.html",{'result':x})
+def calchandler(request):
+    if(request.method == "GET"):
+        return render(request,'index.html',{'result':0});
+    else:
+        if(request.method == "POST"):
+            num = request.number;
+            r.publish("toFront",{'result' : num})
+            msg = sub.get_message();
+            while(msg!=None):
+                for msg in sub.listen():
+                    x = sub.get_message().get('num');
+            return render(request,'index.html',{'result':int(x)});    

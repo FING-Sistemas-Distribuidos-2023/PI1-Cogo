@@ -1,3 +1,3 @@
 source /rediscluster/create_cluster
-kubeclt apply 
-kubeclt apply 
+kubeclt apply -f ./01-backend.yaml
+kubeclt apply -f ./02-frontend.yaml
