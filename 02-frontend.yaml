@@ -1,1 +1,20 @@
-#deploy de docker front n=2
+apiVersion: apps/v1
+kind : Deployment
+metadata:
+  name: frontend
+spect:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    spec:
+      containers:
+      - name: frontend
+        image: mrtc101/frontend:latest
+        imagePullPolicy: Always
+        env:
+        - name: REDIS_HOST
+          value: redis-service
+        - name: REDIS_PORT
+          value: "6379"

@@ -14,10 +14,9 @@ if(host == None or port == None):
 else:
     r = redis.Redis(host=host,port=int(port), decode_responses=True)
 
-goQ = r.pubsub()
-goQ.subscribe("toBack")
-comeQ = r.pubsub()
-comeQ.subscribe("toFront")
+queue = r.pubsub()
+queue.subscribe("toFront")
+queue.get_message()
 
 def getHandler(request : request)->response:
     opResult : int = 0;
@@ -26,7 +25,18 @@ def getHandler(request : request)->response:
         r.publish("toBack",int(a));
         msg = None
         while msg == None:
-            msg = comeQ.get_message();
+            msg = queue.get_message();
             if(msg!=None):
                 opResult = int(msg.get('data'));
     return render(request,'index.html',{'result':opResult});
+
+def calculatorHandler(request : request)->response:
+    result = "";
+    if(request.method == "POST"):
+        r.publish("toBack",request.POST.get("Screen"));
+        msg = None
+        while(msg == None):
+            msg = queue.get_message(True)
+            if(msg != None):
+                result = msg.get('data');
+    return render(request,'calculator.html',{'result':result});

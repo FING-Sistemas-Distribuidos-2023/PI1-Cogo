@@ -1,1 +1,20 @@
-#deploy de docker backend n=1
+apiVersion: apps/v1
+kind : Deployment
+metadata:
+  name: backend
+spect:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    spec:
+      containers:
+      - name: backend
+        image: mrtc101/backend:latest
+        imagePullPolicy: Always
+        env:
+        - name: REDIS_HOST
+          value: redis-service
+        - name: REDIS_PORT
+          value: "6379"

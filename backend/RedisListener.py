@@ -1,6 +1,6 @@
 import os
 import redis;
-import math;
+import ast
 
 host = os.getenv('REDIS_HOST')
 port = os.getenv('REDIS_PORT')
@@ -10,16 +10,20 @@ if(host == None or port == None):
 else:
     r = redis.Redis(host=host,port=int(port), decode_responses=True)
 
-goQ = r.pubsub()
-goQ.subscribe("toFront")
-comeQ = r.pubsub()
-comeQ.subscribe("toBack")
+queue = r.pubsub()
+queue.subscribe("toBack")
 
-while True:    
-    msg =  comeQ.get_message()
+def calculate(equation : str):
+    try:
+        ast_tree = ast.parse(equation, mode='eval')
+        exp = compile(ast_tree, filename="<ast>", mode="eval")
+        result = eval(exp)
+    except:
+        result = "ERROR"
+    return result
+
+while True:
+    msg = queue.get_message(True) 
     if msg != None:
-        print(msg)
-        x = int(msg.get('data'))
-        if(x != None):
-            r.publish("toFront",x*x)    
-        
+        result = calculate(str(msg['data']))
+        r.publish("toFront",result) 
