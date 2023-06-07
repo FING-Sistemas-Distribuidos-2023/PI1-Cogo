@@ -41,7 +41,7 @@ kind: Ingress
 metadata:
   name: frontend-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /calculadora/
+    nginx.ingress.kubernetes.io/rewrite-target: /calculator/
 spec:
   ingressClassName : nginx
   rules:
